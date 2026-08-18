@@ -9,8 +9,6 @@ string tomlPath = args.Length > 0
       ?? throw new ArgumentException("Pass a problem.toml path as the first argument.");
 
 Problem problem = ProblemLoader.Load(tomlPath);
-// double timeSec = problem.Limits.TimeSec ?? 4.0;
-// int memoryKb = problem.Limits.CgMemoryKb ?? 262144;
 
 Console.WriteLine(problem.Meta.Title);        // "Two Sum"
 Console.WriteLine(problem.Meta.Revision);     // 3
