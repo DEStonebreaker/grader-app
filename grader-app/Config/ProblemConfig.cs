@@ -1,4 +1,5 @@
 using Tomlyn.Model;
+
 namespace grader_app.Config;
 
 public sealed record Problem

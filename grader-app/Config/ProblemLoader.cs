@@ -10,7 +10,7 @@ public static class ProblemLoader
         string fullPath = Path.GetFullPath(tomlPath);
         string directory = Path.GetDirectoryName(fullPath)!;
         TomlTable root = TomlSerializer.Deserialize<TomlTable>(File.ReadAllText(fullPath))!;
-        
+
         return new Problem
         {
             Meta = ReadMeta(root),

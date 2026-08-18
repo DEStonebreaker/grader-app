@@ -1,0 +1,29 @@
+[problem]
+id = "two-sum"
+title = "Two Sum"
+revision = 1
+
+[limits]
+time_sec = 1.0
+cg_memory_kb = 262144
+
+[checker]
+type = "token"
+
+[[tests]]
+name = "01"
+input = "tests/01.in"
+answer = "tests/01.ans"
+sample = true
+
+[[tests]]
+name = "02"
+input = "tests/02.in"
+answer = "tests/02.ans"
+sample = true
+
+[[tests]]
+name = "03"
+input = "tests/03.in"
+answer = "tests/03.ans"
+sample = false

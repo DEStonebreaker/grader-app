@@ -9,7 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="CliWrap" Version="3.10.4" />
       <PackageReference Include="Tomlyn" Version="2.10.1" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Comparison\" />
     </ItemGroup>
 
 </Project>
