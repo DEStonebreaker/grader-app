@@ -17,6 +17,8 @@ Console.WriteLine(problem.Tests.Count);       // 2
 foreach (TestMeta test in problem.Tests)
 {
     Console.WriteLine($"{test.Name}  sample={test.IsSample}");
+    Console.WriteLine($"    in-path@  {test.InputPath}\n" +
+                      $"    ans-path@ {test.AnsPath}");
     string input = File.ReadAllText(test.InputPath);
     string expected = File.ReadAllText(test.AnsPath);
 }
