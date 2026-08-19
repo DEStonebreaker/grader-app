@@ -123,6 +123,7 @@ public sealed class ProblemRunner
 
         BufferedCommandResult diff = await Cli.Wrap("diff")
             .WithArguments(["-u", test.AnsPath, outPath])
+            .WithWorkingDirectory("/")
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync();
 
@@ -139,9 +140,14 @@ public sealed class ProblemRunner
     }
 
     // Isolate exits non-zero for a failed run, which is a normal outcome here.
+    //
+    // The working directory is pinned to "/" because .NET chdir()s into it in the
+    // forked child: inheriting a caller's home directory fails with EACCES when the
+    // grader runs as the judge account.
     private static Task<BufferedCommandResult> Isolate(string[] arguments) =>
         Cli.Wrap("isolate")
             .WithArguments(arguments)
+            .WithWorkingDirectory("/")
             .WithValidation(CommandResultValidation.None)
             .ExecuteBufferedAsync();
 
