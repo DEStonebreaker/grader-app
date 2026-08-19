@@ -1,0 +1,70 @@
+# Compile check for grader-app.
+#
+# The grader cannot be end-to-end tested here: it shells out to `isolate`, which
+# needs a setuid binary, cgroup delegation, and a configured box tmpfs that a
+# GitHub runner does not have. So this verifies the two things CI can verify —
+# that the code compiles warning-free, and that the published output actually
+# starts under the .NET runtime the judge host uses.
+
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+# Read-only: this workflow never writes to the repo.
+permissions:
+  contents: read
+
+jobs:
+  build:
+    # ubuntu-latest, to match the judge host. The code is Linux-only anyway.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      # No global.json in the repo, so the SDK version is pinned here instead.
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore
+        run: dotnet restore grader-app.sln
+
+      # -warnaserror because the build is warning-free today; this keeps it that way.
+      - name: Build
+        run: dotnet build grader-app.sln -c Release --no-restore -warnaserror
+
+      # Same command the Makefile's deploy target runs, so a publish that would
+      # fail on the way to the judge host fails here first.
+      - name: Publish
+        run: dotnet publish grader-app -c Release -o out/judge
+
+      # A framework-dependent publish can compile and still not launch — a missing
+      # dependency or a bad runtimeconfig only shows up at startup. Running the
+      # usage path proves the drop is executable. Two args are required, so the
+      # no-argument case exits 2 without ever reaching isolate.
+      - name: Smoke-test the published CLI
+        run: |
+          set +e
+          output=$(dotnet out/judge/grader-app.dll 2>&1)
+          code=$?
+          set -e
+
+          echo "exit=$code"
+          echo "$output"
+
+          if [ "$code" -ne 2 ]; then
+            echo "::error::expected exit 2 from the usage guard, got $code"
+            exit 1
+          fi
+
+          case "$output" in
+            *"usage: grader-app"*) ;;
+            *) echo "::error::usage line missing from stderr"; exit 1 ;;
+          esac
