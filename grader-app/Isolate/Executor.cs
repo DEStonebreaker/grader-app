@@ -334,13 +334,40 @@ public sealed class IsolateExecutor
                 continue;
             }
 
-            if (source.LinkTarget is not null)
-            {
-                throw new InvalidDataException(
-                    $"Sandbox output cannot be a symbolic link: {output.SandboxPath}");
-            }
+            EnsureSandboxOutputHasNoSymbolicLinks(
+                boxDirectory,
+                sourcePath,
+                output.SandboxPath);
 
             await CopyNewFileAsync(sourcePath, output.HostPath, cancellationToken);
+        }
+    }
+
+    private static void EnsureSandboxOutputHasNoSymbolicLinks(
+        string boxDirectory,
+        string sourcePath,
+        string sandboxPath)
+    {
+        // Check every component because a regular file beneath a linked directory can escape the box.
+        var relativePath = Path.GetRelativePath(boxDirectory, sourcePath);
+        var pathSegments = relativePath.Split(
+            Path.DirectorySeparatorChar,
+            StringSplitOptions.RemoveEmptyEntries);
+        var currentPath = boxDirectory;
+
+        for (var index = 0; index < pathSegments.Length; index++)
+        {
+            currentPath = Path.Combine(currentPath, pathSegments[index]);
+            FileSystemInfo entry = index == pathSegments.Length - 1
+                ? new FileInfo(currentPath)
+                : new DirectoryInfo(currentPath);
+            entry.Refresh();
+
+            if (entry.LinkTarget is not null)
+            {
+                throw new InvalidDataException(
+                    $"Sandbox output cannot contain a symbolic link: {sandboxPath}");
+            }
         }
     }
 

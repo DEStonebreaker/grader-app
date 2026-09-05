@@ -1,5 +1,4 @@
-using CliWrap;
-using grader_app.Config;
+using System.Globalization;
 
 namespace grader_app.Isolate;
 
@@ -43,8 +42,8 @@ public static class Isolate
         {
             "--cg",
             $"--box-id={boxId}",
-            $"--time={opts.CpuSeconds}",
-            $"--wall-time={opts.WallSeconds}",
+            $"--time={opts.CpuSeconds.ToString(CultureInfo.InvariantCulture)}",
+            $"--wall-time={opts.WallSeconds.ToString(CultureInfo.InvariantCulture)}",
             $"--cg-mem={opts.MemoryKb}"
         };
 

@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grader-app", "grader-app\grader-app.csproj", "{DA64C76D-76F5-4514-A27C-63D25F29125B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "grader-app.Tests", "grader-app.Tests\grader-app.Tests.csproj", "{5C39350A-C049-4A77-AEDA-58CC523B553B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{DA64C76D-76F5-4514-A27C-63D25F29125B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA64C76D-76F5-4514-A27C-63D25F29125B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DA64C76D-76F5-4514-A27C-63D25F29125B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C39350A-C049-4A77-AEDA-58CC523B553B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C39350A-C049-4A77-AEDA-58CC523B553B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C39350A-C049-4A77-AEDA-58CC523B553B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C39350A-C049-4A77-AEDA-58CC523B553B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
