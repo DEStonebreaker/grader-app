@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using CliWrap;
 
 namespace grader_app;
 
-public static class ProblemRunner
+public class IsolateRunner
 {
+    private const string ISOLATE_BINARY = "/usr/local/bin/isolate";
 }

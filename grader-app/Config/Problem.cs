@@ -17,8 +17,8 @@ public sealed class ProblemSection
 public sealed class LimitSection
 {
     [TomlPropertyName("rt_seconds")] public double RtSeconds { get; set; } = 0.0;
-    [TomlPropertyName("rt_memory_kb")] public uint RtMemoryKb { get; set; } = 0;
+    [TomlPropertyName("rt_memory_kb")] public uint RtMemoryKb { get; set; }
 
     [TomlPropertyName("ct_seconds")] public double CtSeconds { get; set; } = 0.0;
-    [TomlPropertyName("ct_memory_kb")] public uint CtMemoryKb { get; set; } = 0;
+    [TomlPropertyName("ct_memory_kb")] public uint CtMemoryKb { get; set; }
 }
