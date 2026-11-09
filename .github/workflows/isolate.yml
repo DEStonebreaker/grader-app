@@ -1,0 +1,22 @@
+name: Native x64 Isolate validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  sandbox:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Prepare dedicated hosted judge environment
+        run: ./scripts/setup-ubuntu.sh
+      - name: Validate as unprivileged judge
+        shell: bash
+        run: |
+          set -euo pipefail
+          validation_dir=$(sudo -u judge mktemp -d /home/judge/valimark-validation.XXXXXX)
+          tar --exclude=.git --exclude=bin --exclude=obj --exclude=artifacts -cf - . | sudo -u judge tar -C "$validation_dir" -xf -
+          sudo -u judge bash -c 'cd "$1" && ./scripts/validate-linux.sh' bash "$validation_dir"
