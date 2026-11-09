@@ -19,6 +19,7 @@
 
     <ItemGroup>
         <ProjectReference Include="../grader-app/grader-app.csproj" />
+        <ProjectReference Include="../examples/sum/driver/SumDriver.csproj" />
     </ItemGroup>
 
 </Project>

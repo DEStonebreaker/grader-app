@@ -193,3 +193,65 @@ public sealed class RealIsolateIntegrationTests
         }
     }
 }
+
+[Collection("CLI")]
+public sealed class RealGradingIntegrationTests
+{
+    [RealIsolateFact]
+    [Trait("Category", "RealIsolate")]
+    public async Task CSharpDriverGradesBothCasesThroughRealIsolate()
+    {
+        var root = Directory.CreateTempSubdirectory("valimark-driver-integration-").FullName;
+        try
+        {
+            var driverPath = Path.Combine(root, "SumDriver.dll");
+            File.Copy(typeof(SumDriver.NumericDriver).Assembly.Location, driverPath);
+            await File.WriteAllTextAsync(Path.Combine(root, "problem.toml"), """
+                [problem]
+                title = "Real driver integration"
+                [limits]
+                ct_seconds = 10.0
+                ct_memory_kb = 262144
+                rt_seconds = 1.0
+                rt_memory_kb = 65536
+                [grading]
+                driver_assembly = "SumDriver.dll"
+                driver_type = "SumDriver.NumericDriver"
+                [[tests]]
+                name = "positive"
+                input = "positive.in"
+                expected = "positive.answer"
+                [[tests]]
+                name = "negative"
+                input = "negative.in"
+                expected = "negative.answer"
+                """);
+            await File.WriteAllTextAsync(Path.Combine(root, "positive.in"), "1 2\n");
+            await File.WriteAllTextAsync(Path.Combine(root, "positive.answer"), "3\n");
+            await File.WriteAllTextAsync(Path.Combine(root, "negative.in"), "-7 2\n");
+            await File.WriteAllTextAsync(Path.Combine(root, "negative.answer"), "-5\n");
+            var source = Path.Combine(root, "main.cpp");
+            await File.WriteAllTextAsync(source, """
+                #include <iostream>
+                #include <unistd.h>
+                #include <cstdio>
+                int main() {
+                    if (access("marker", F_OK) == 0) return 7;
+                    FILE *marker = fopen("marker", "w");
+                    if (!marker) return 8;
+                    fclose(marker);
+                    long long a, b;
+                    std::cin >> a >> b;
+                    std::cout << a + b << '\n';
+                }
+                """);
+            var output = new StringWriter();
+            var code = await GraderCli.RunAsync(["grade", root, source, "--box-id", "95", "--format", "json"],
+                output, new StringWriter());
+            Assert.True(code == 0, output.ToString());
+            using var report = System.Text.Json.JsonDocument.Parse(output.ToString());
+            Assert.Equal(2, report.RootElement.GetProperty("cases").GetArrayLength());
+        }
+        finally { Directory.Delete(root, recursive: true); }
+    }
+}

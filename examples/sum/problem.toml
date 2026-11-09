@@ -1,0 +1,24 @@
+[problem]
+title = "Add two integers"
+
+[limits]
+ct_seconds = 10.0
+ct_memory_kb = 262144
+rt_seconds = 1.0
+rt_memory_kb = 65536
+
+[grading]
+# Omit driver_assembly/driver_type to use the built-in token checker.
+checker = "tokens"
+driver_assembly = "driver/bin/Release/net10.0/SumDriver.dll"
+driver_type = "SumDriver.NumericDriver"
+
+[[tests]]
+name = "positive"
+input = "tests/positive.in"
+expected = "tests/positive.out"
+
+[[tests]]
+name = "negative"
+input = "tests/negative.in"
+expected = "tests/negative.out"

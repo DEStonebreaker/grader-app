@@ -123,6 +123,7 @@ public sealed class Compiler
             TerminationReason.TimeLimitExceeded => CompilationOutcome.TimeLimitExceeded,
             TerminationReason.MemoryLimitExceeded => CompilationOutcome.MemoryLimitExceeded,
             TerminationReason.SandboxError => CompilationOutcome.SandboxError,
+            TerminationReason.Exited when execution.ExitCode is null => CompilationOutcome.SandboxError,
             TerminationReason.Exited when execution.ExitCode != 0 => CompilationOutcome.CompilerError,
             TerminationReason.Signaled => CompilationOutcome.CompilerError,
             TerminationReason.Exited when IsUsableExecutable(outputPath) => CompilationOutcome.Succeeded,

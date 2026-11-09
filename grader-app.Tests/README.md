@@ -46,3 +46,13 @@ dotnet format
 dotnet build
 dotnet test
 ```
+
+The multi-case grading tests exercise the CLI with a fake Isolate, including a
+real loaded C# driver assembly, verdicts, JSON diagnostics, truncation, cancellation,
+and cross-process box leases. The real-Isolate lane also grades two cases through
+the C# example driver and checks that runtime files do not leak between cases.
+
+For a full published-artifact check on an already configured Ubuntu x64 host,
+run `./scripts/validate-linux.sh` as `judge`. It enables every real sandbox test
+and grades both example C/C++ submissions through the published CLI. See
+[VM setup](../scripts/README.md) for the toolchain and cgroup setup.

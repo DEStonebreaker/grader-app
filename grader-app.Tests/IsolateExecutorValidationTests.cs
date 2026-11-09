@@ -5,6 +5,23 @@ namespace grader_app.Tests;
 
 public sealed class IsolateExecutorValidationTests
 {
+    [Theory]
+    [InlineData(0, 1, 1, 1)]
+    [InlineData(double.NaN, 1, 1, 1)]
+    [InlineData(1, double.PositiveInfinity, 1, 1)]
+    [InlineData(1, 1, 0, 1)]
+    [InlineData(1, 1, 1, 0)]
+    public async Task InvalidResourceLimitsAreRejectedBeforeAllocatingABox(
+        double cpu, double wall, uint memory, uint processes)
+    {
+        using var fake = new FakeIsolate();
+        var request = CreateRequest() with
+        {
+            Options = new IsolateRunOptions(cpu, wall, memory, processes, new Dictionary<string, string>())
+        };
+        await AssertValidationFailureAsync<ArgumentException>(fake, request);
+    }
+
     [Fact]
     public void ExecutorRequiresAnAbsoluteIsolatePath()
     {

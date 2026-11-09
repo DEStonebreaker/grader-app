@@ -23,7 +23,9 @@ public sealed record ExecutionResult(
     long? PeakMemoryKb,
     string StandardOutput,
     string StandardError,
-    string? SandboxMessage);
+    string? SandboxMessage,
+    bool StandardOutputTruncated = false,
+    bool StandardErrorTruncated = false);
 
 public sealed record SandboxInputFile(
     string HostPath,
@@ -186,6 +188,7 @@ public sealed class IsolateExecutor
     {
         // Reject invalid host paths before allocating a sandbox or copying any files.
         ArgumentNullException.ThrowIfNull(request.Options);
+        Isolate.ValidateOptions(request.Options);
         ArgumentException.ThrowIfNullOrWhiteSpace(request.Executable);
         ArgumentNullException.ThrowIfNull(request.ExecutableArguments);
         ArgumentNullException.ThrowIfNull(request.InputFiles);
@@ -601,7 +604,9 @@ public sealed class IsolateExecutor
         return new CapturedCommandResult(
             commandResult,
             standardOutput.GetText(),
-            standardError.GetText());
+            standardError.GetText(),
+            standardOutput.WasTruncated,
+            standardError.WasTruncated);
     }
 
     private static ExecutionResult CreateExecutionResult(
@@ -641,7 +646,9 @@ public sealed class IsolateExecutor
             ParseInt64(metadata, "cg-mem") ?? ParseInt64(metadata, "max-rss"),
             capturedResult.StandardOutput,
             capturedResult.StandardError,
-            sandboxMessage);
+            sandboxMessage,
+            capturedResult.StandardOutputTruncated,
+            capturedResult.StandardErrorTruncated);
     }
 
     private static ExecutionResult SandboxFailure(
@@ -758,12 +765,15 @@ public sealed class IsolateExecutor
     private sealed record CapturedCommandResult(
         CommandResult CommandResult,
         string StandardOutput,
-        string StandardError);
+        string StandardError,
+        bool StandardOutputTruncated,
+        bool StandardErrorTruncated);
 
     private sealed class BoundedOutputCapture(int maxBytes)
     {
         private readonly MemoryStream _content = new();
         private bool _wasTruncated;
+        public bool WasTruncated => _wasTruncated;
 
         public async Task CopyFromAsync(Stream source, CancellationToken cancellationToken)
         {

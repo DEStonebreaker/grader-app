@@ -62,6 +62,28 @@ internal sealed class FakeIsolate : IDisposable
                                   done
 
                                   case "$scenario" in
+                                      grading)
+                                          if [ -f "$box_dir/main.c" ] || [ -f "$box_dir/main.cpp" ]; then
+                                              printf 'fake executable\n' > "$box_dir/main"
+                                              chmod 755 "$box_dir/main"
+                                              printf 'status:RE\nexitcode:0\n' > "$metadata_path"
+                                          else
+                                              case "$(cat "$box_dir/$stdin_path")" in
+                                                  TIME) printf 'status:TO\n' > "$metadata_path" ;;
+                                                  MEMORY) printf 'status:RE\ncg-oom-killed:1\n' > "$metadata_path" ;;
+                                                  CRASH) printf 'status:SG\nexitsig:11\n' > "$metadata_path" ;;
+                                                  BROKEN) printf 'status:XX\nmessage:broken host\n' > "$metadata_path" ;;
+                                                  LARGE)
+                                                      cat "$script_dir/large-output.txt"
+                                                      printf 'status:RE\nexitcode:0\n' > "$metadata_path"
+                                                      ;;
+                                                  *)
+                                                      cat "$box_dir/$stdin_path"
+                                                      printf 'status:RE\nexitcode:0\n' > "$metadata_path"
+                                                      ;;
+                                              esac
+                                          fi
+                                          ;;
                                       success|cleanup-failure)
                                           printf 'status:RE\nexitcode:0\ntime:0.125\ntime-wall:0.25\ncg-mem:321\n' > "$metadata_path"
                                           printf 'fake stdout'

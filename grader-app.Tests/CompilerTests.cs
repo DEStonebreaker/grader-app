@@ -13,6 +13,7 @@ public sealed class CompilerTests
     [InlineData("compiler-sandbox-error", CompilationOutcome.SandboxError, false)]
     [InlineData("compiler-output-missing", CompilationOutcome.OutputMissing, false)]
     [InlineData("compiler-signaled", CompilationOutcome.CompilerError, false)]
+    [InlineData("malformed-metadata", CompilationOutcome.SandboxError, false)]
     public async Task CompileClassifiesEveryOutcome(
         string scenario,
         CompilationOutcome expectedOutcome,

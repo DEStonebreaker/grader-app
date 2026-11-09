@@ -37,7 +37,7 @@ public static class Isolate
         string? standardInputPath = null)
     {
         // Keep every option as a separate argument so executable-controlled values never reach a shell.
-        // TODO: Option validation here
+        ValidateOptions(opts);
         var arguments = new List<string>
         {
             "--cg",
@@ -101,6 +101,18 @@ public static class Isolate
         }
 
         return $"--env={name}={value}";
+    }
+
+    public static void ValidateOptions(IsolateRunOptions opts)
+    {
+        ArgumentNullException.ThrowIfNull(opts);
+        if (!double.IsFinite(opts.CpuSeconds) || opts.CpuSeconds <= 0 ||
+            !double.IsFinite(opts.WallSeconds) || opts.WallSeconds <= 0 ||
+            opts.MemoryKb == 0 || opts.MaxProcesses == 0)
+            throw new ArgumentException("Sandbox time, memory, and process limits must be positive and finite.", nameof(opts));
+        ArgumentNullException.ThrowIfNull(opts.EnvironmentVariables);
+        foreach (var variable in opts.EnvironmentVariables)
+            _ = CreateEnvironmentArgument(variable.Key, variable.Value);
     }
 
     private static bool IsEnvironmentNameStart(char character)

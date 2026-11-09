@@ -99,6 +99,8 @@ public sealed class IsolateExecutorResultTests
         Assert.Equal(captureLimit + marker.Length, result.StandardError.Length);
         Assert.EndsWith(marker, result.StandardOutput);
         Assert.EndsWith(marker, result.StandardError);
+        Assert.True(result.StandardOutputTruncated);
+        Assert.True(result.StandardErrorTruncated);
     }
 
     private static async Task<ExecutionResult> ExecuteScenarioAsync(
